@@ -28,4 +28,11 @@ functions:
           path: searches
           method: get
           cors: true
+  addSearch:
+    handler: src/handler.addSearch
+    events:
+      - http:
+          path: searches
+          method: post
+          cors: true
 
