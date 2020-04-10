@@ -7,12 +7,12 @@ plugins:
   - serverless-offline
 
 custom:
+  myStage: ${opt:stage, self:provider.stage}
   serverless-offline:
     httpPort: 3000
   resourceStages:
     prod: prod
     dev: dev
-
 
 provider:
   name: aws
@@ -20,6 +20,11 @@ provider:
   timeout: 5
   memorySize: 128
   stage: dev
+  environment:
+    searchRequestTable: ${opt:stage}-search_request
+    userInfoTable: ${opt:stage}-user_info
+
+
 functions:
   getSearches:
     handler: src/handler.getSearches
@@ -35,4 +40,44 @@ functions:
           path: searches
           method: post
           cors: true
+
+
+resources:
+  Resources:
+
+    ###
+    # DynamoB table for storing all URLs and search terms we need to crawl the web for
+    searchRequestTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.searchRequestTable}
+        AttributeDefinitions:
+          - AttributeName: url
+            AttributeType: S
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: url
+            KeyType: HASH
+          - AttributeName: user_id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 5
+
+    ###
+    # DynamoDB Table for storing a user's information (phone number, e-mail, etc)
+    userInfoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.userInfoTable}
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 5
 
