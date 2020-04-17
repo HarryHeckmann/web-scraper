@@ -2,6 +2,7 @@
 import { createSearch } from './services/search_request_repo';
 import { getSearchesByUserId } from "./services/search_request_repo";
 import { createUser } from "./services/user_repo";
+import { scrape } from "./services/scraper_service";
 
 export const getSearches = async event => {
 
@@ -36,4 +37,11 @@ export const addUser = async (event, context, callback) => {
   await createUser(userId, body.phoneNum);
 
   callback(null, {statusCode: 200});
+};
+
+export const scraper = async (event, context, callback) => {
+  console.log('Starting web scrape daemon service');
+  await scrape();
+
+  callback(null, 'Function Complete!');
 };

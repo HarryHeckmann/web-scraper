@@ -24,6 +24,16 @@ provider:
     searchRequestTable: ${opt:stage}-search_request
     userInfoTable: ${opt:stage}-user_info
   iamRoleStatements:
+    # Deny publishing to any application specific topic (specified through an ARN)
+    - Effect: 'Deny'
+      Action:
+        - 'sns:Publish'
+      Resource: 'arn:aws:sns:*:*:*'
+    # Allow for publishing to wildcard resource, which includes SMS text messaging
+    - Effect: 'Allow'
+      Action:
+        - 'sns:Publish'
+      Resource: '*'
     # Allow read/write access to the DynamoDB Table we're creating below
     - Effect: 'Allow'
       Action:
@@ -39,6 +49,13 @@ provider:
 
 
 functions:
+  # the cron job that does the web scraping
+  scraper:
+    handler: src/handler.scraper
+    events:
+      - schedule: rate(15 minutes)
+
+  # http related lambdas
   getSearches:
     handler: src/handler.getSearches
     events:

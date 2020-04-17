@@ -6,6 +6,7 @@
     "serverless-offline": "^6.1.4"
   },
   "dependencies": {
-    "aws-sdk": "^2.656.0"
+    "aws-sdk": "^2.656.0",
+    "node-fetch": "^2.6.0"
   }
 }

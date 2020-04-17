@@ -84,6 +84,23 @@ export const getSearchesByUserId = async (userId) => {
       ).catch(err => console.log('Failed to query DynamoDb:', err));
 };
 
+export const getActiveSearches = async () => {
+  console.log('Scanning DynamoDB Table', searchRequestTable);
+
+  const scanParams = {
+    TableName: searchRequestTable,
+    ProjectExpression: 'url, isFound, searches',
+    FilterExpression: 'isFound = :notFound',
+    ExpressionAttributeValues: {
+      ':notFound': false
+    }
+  };
+
+  return dynamoDb.scan(scanParams).promise()
+      .then( resp => resp.Items )
+      .catch( err => console.log("Failed to scan DynamoDB table", err));
+};
+
 const saveItem = async (url, userId, searches) => {
   console.log(`Writing new item Url(${url}) UserId(${userId}) Searches(${searches})`);
 

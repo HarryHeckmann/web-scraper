@@ -19,3 +19,19 @@ export const createUser = async (userId, phoneNum) => {
     err ? console.log('Failed to write to DynamoDb', err) : console.log('DynamoDb write successful!', data);
   });
 };
+
+export const getUser = (userId) => {
+  console.log('Looking up user', userId);
+
+  const getItemParams =  {
+    TableName: userInfoTable,
+    Key: { 'userId': userId }
+  };
+
+  return dynamoDb.get(getItemParams).promise()
+      .then( data => {
+        console.log('Found UserInfo', data);
+        return data.Item;
+      })
+      .catch( err => console.log('Error looking up User', err) );
+};
