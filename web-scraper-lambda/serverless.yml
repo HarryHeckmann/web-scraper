@@ -23,6 +23,19 @@ provider:
   environment:
     searchRequestTable: ${opt:stage}-search_request
     userInfoTable: ${opt:stage}-user_info
+  iamRoleStatements:
+    # Allow read/write access to the DynamoDB Table we're creating below
+    - Effect: 'Allow'
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+      Resource:
+        - "Fn::GetAtt": [ searchRequestTable, Arn ]
+        - "Fn::GetAtt": [ userInfoTable, Arn ]
 
 
 functions:
@@ -54,12 +67,12 @@ resources:
         AttributeDefinitions:
           - AttributeName: url
             AttributeType: S
-          - AttributeName: user_id
+          - AttributeName: userId
             AttributeType: S
         KeySchema:
           - AttributeName: url
             KeyType: HASH
-          - AttributeName: user_id
+          - AttributeName: userId
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 10
@@ -72,10 +85,10 @@ resources:
       Properties:
         TableName: ${self:provider.environment.userInfoTable}
         AttributeDefinitions:
-          - AttributeName: user_id
+          - AttributeName: userId
             AttributeType: S
         KeySchema:
-          - AttributeName: user_id
+          - AttributeName: userId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 10
