@@ -101,6 +101,24 @@ export const getActiveSearches = async () => {
       .catch( err => console.log("Failed to scan DynamoDB table", err));
 };
 
+export const markUrlAsFound = async (url, userId) => {
+  console.log(`Marking [${url}] with UserID [${userId}] as found in DynamoDB`);
+
+  const updateParams = {
+    TableName: searchRequestTable,
+    Key: { 'url': url, 'userId': userId },
+    UpdateExpression: 'set isFound = :found',
+    ExpressionAttributeValues: {
+      ':found': true
+    }
+  };
+
+  dynamoDb.update(updateParams).promise()
+      .then(data => console.log('Successfully updated UserId & URL', data))
+      .catch(err => console.log('Failed to update record in DynamoDb', err));
+
+};
+
 const saveItem = async (url, userId, searches) => {
   console.log(`Writing new item Url(${url}) UserId(${userId}) Searches(${searches})`);
 

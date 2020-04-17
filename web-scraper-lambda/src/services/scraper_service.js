@@ -1,9 +1,9 @@
 
 import fetch from 'node-fetch';
 
-import { getActiveSearches } from "./search_request_repo";
+import { getActiveSearches, markUrlAsFound } from "./search_request_repo";
 import { sendSmsTextMessage } from "./sms_service";
-import {getUser} from "./user_repo";
+import { getUser } from "./user_repo";
 
 export const scrape = async () => {
   console.log('Scraping the web to check all our searches');
@@ -30,6 +30,7 @@ export const scrape = async () => {
 
           if (userInfo) {
             sendSmsTextMessage(userInfo.phoneNum, textMsgBody);
+            markUrlAsFound(fetchUrl, userId);
           } else {
             console.log('UserID does not exist', userId);
           }
