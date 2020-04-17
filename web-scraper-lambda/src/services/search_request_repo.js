@@ -43,6 +43,47 @@ export const getSearch = async (url, userId) => {
   return response.Item;
 };
 
+export const getSearchesByUserId = async (userId) => {
+  console.log(`Looking up DynamoDB Items that match UserId(${userId})`);
+
+  const queryRequest = {
+    TableName: searchRequestTable,
+    IndexName: "UserIdIndex",
+    KeyConditionExpression: "userId = :userId",
+    ProjectionExpression: "#url, searches, isFound",
+    ExpressionAttributeNames: {
+      "#url": "url"
+    },
+    ExpressionAttributeValues: {
+      ":userId": userId
+    },
+    ScanIndexForward: false
+  };
+
+
+  return await dynamoDb.query(queryRequest).promise()
+      .then( resp => {
+          console.log(`Found (${resp.Count}) matching items`);
+          console.log('All Items Found:', resp.Items);
+
+          // resp.Items isn't actually an Array, it's an AWS SDK type AttributeMap.  We can't use reduce(...)
+          let transformedResponse = [];
+          resp.Items.forEach((item) => {
+            item.searches.forEach((search) => {
+              transformedResponse.push({
+                userId: userId,
+                url: item.url,
+                searchText: search
+              });
+            });
+          });
+
+          console.log('Transformed Response:', transformedResponse);
+          return transformedResponse;
+        }
+      ).catch(err => console.log('Failed to query DynamoDb:', err));
+};
+
 const saveItem = async (url, userId, searches) => {
   console.log(`Writing new item Url(${url}) UserId(${userId}) Searches(${searches})`);
 

@@ -1,17 +1,17 @@
 
 import { createSearch } from './services/search_request_repo';
+import { getSearchesByUserId } from "./services/search_request_repo";
 
-export const getSearches = async event => ({
-  statusCode: 200,
-  body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-  ),
-});
+export const getSearches = async event => {
+
+  const userId = event.headers['X-UserId'];
+  const responseBody = await getSearchesByUserId(userId);
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(responseBody, null, 2)
+  };
+};
 
 /**
  * Add a new search record

@@ -77,6 +77,16 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 10
           WriteCapacityUnits: 5
+        GlobalSecondaryIndexes:
+          - IndexName: UserIdIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 5
 
     ###
     # DynamoDB Table for storing a user's information (phone number, e-mail, etc)
