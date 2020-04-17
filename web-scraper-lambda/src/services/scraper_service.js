@@ -53,7 +53,8 @@ const searchUrl = (url, searches) => {
       .then(htmlResponse => {
         let found = false;
         searches.forEach((searchTerm) => {
-          if (htmlResponse.match(searchTerm) !== null) {
+          const regexTerm = new RegExp(searchTerm, 'i');
+          if (htmlResponse.match(regexTerm) !== null) {
             found = true;
             console.log(`Found term (${searchTerm}) on URL(${url})`);
           } else {
